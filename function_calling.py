@@ -1,7 +1,7 @@
 import openai
 
 # Set your OpenAI API key
-openai.api_key = "your-api-key-here"
+openai.api_key = ""
 
 
 # Placeholder function for making an API call
