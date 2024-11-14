@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripTrek</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: #f4f4f9; 
+            background-image: url('static/takeoff.jpg'); /* Update this path to your image */
+            background-size: cover; /* Ensure the image covers the entire background */
+            background-position: center; /* Center the image */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .header-bar {
+            width: 100%;
+            background-color: #979797;
+            color: black;
+            text-align: center;
+            padding: 10px 0;
+            position: absolute;
+            top: 0;
+            font-size: 18px;
+        }
+        .wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+        #chat-box { 
+            width: 80%;
+            max-width: 85%; /* Increase the max-width to make it wider */
+            padding: 20px;
+            border-radius: 8px;
+            background: rgba(199, 199, 199, 0.8);
+        }
+        #chat-output { 
+            max-height: 550px; 
+            overflow-y: auto; 
+            margin-top: 20px;
+        }
+        #chat-input { 
+            width: 98%; 
+            padding: 10px; 
+            margin-top: 10px; 
+            border-radius: 25px; /* Make the input box oval */
+            background-color: white; /* Set background color to black */
+            color: #747474; /* Set text color to grey */
+            border: none; /* Remove border */
+        }
+        h2, h3 {
+            display: inline-block;
+            margin: 0;
+        }
+        h2 {
+            margin-right: 10px; /* Add space between h2 and h3 */
+        }
+        .user-message {
+            background-color: #1F8AFF;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            /* start halfway through and extend to right horizontally */
+            margin-left: 50%;
+        }
+        .bot-message {
+            background-color: #d8d8d8;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            margin-right: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-bar">
+        Vacation Starts With Finding Your Flight
+    </div>
+    <div id="chat-box">
+        <h2>TripTrek |</h2><h3> Stress Free Flying...</h3>
+        <div id="chat-output"></div>
+        <input type="text" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key === 'Enter') sendMessage()">
+    </div>
+
+    <script>
+        function sendMessage() {
+            const inputBox = document.getElementById("chat-input");
+            const message = inputBox.value;
+            if (message.trim()) {
+                const chatOutput = document.getElementById("chat-output");
+                chatOutput.innerHTML += `<div class="message user-message"> ${message}</div>`; // Updated line
+                inputBox.value = '';
+                
+                fetch("/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ user_input: message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const formattedResponse = data.response.replace(/\n/g, '<br>'); // Replace newlines with <br>
+                    let formattedResponse1 = formattedResponse
+                        .replace(/(\$\d+(\.\d{2})?)/g, '<strong>$1</strong>') // Highlight prices
+                    
+                    //prettify the response
+                    data.response = formattedResponse1;
+                    chatOutput.innerHTML += `<div class="message bot-message">${formattedResponse1}</div>`;
+                    chatOutput.scrollTop = chatOutput.scrollHeight;
+                });
+            }
+        }
+    </script>
+</body>
+</html>
